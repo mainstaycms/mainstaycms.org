@@ -1,0 +1,65 @@
+#!/bin/sh
+# Makes a release of mainstaycms.org live: the tarball CI built arrives on
+# stdin, and the commit it was built from in SSH_ORIGINAL_COMMAND. Installed
+# root-owned as /usr/local/sbin/receive-mainstaycms-org-release and run only
+# as the forced command of the deploy key, so a change here reaches the server
+# by hand, never through CI.
+#
+# Everything a release holds is written as the site's own user: Apache follows
+# a symlink only to what the link's owner owns, and the tarball is unpacked
+# without root's powers over the filesystem.
+set -eu
+
+site=/srv/www/mainstaycms.org/sites/mainstaycms.org
+owner=mainstaycms_org
+releases_kept=5
+
+commit=${SSH_ORIGINAL_COMMAND:-}
+
+case $commit in
+    '' | *[!0-9a-f]*)
+        echo "Expected the commit being deployed, got '$commit'." >&2
+        exit 64
+        ;;
+esac
+
+if [ ${#commit} -ne 40 ]; then
+    echo "Expected a full 40-character commit hash, got '$commit'." >&2
+    exit 64
+fi
+
+as_owner() {
+    runuser -u "$owner" -- "$@"
+}
+
+release=$site/releases/$(date -u +%Y%m%d%H%M%S)-$commit
+
+# A release that fails before going live is removed, so the ones kept are
+# ones that were live and can be rolled back to.
+trap 'rm -rf "$release"' EXIT
+
+as_owner mkdir -p "$release"
+as_owner tar -xzf - -C "$release"
+# Apache passes through a release and reads only its public/, as the
+# hosting layout grants every site.
+as_owner setfacl -m u:www-data:--x "$release"
+as_owner setfacl -R -m u:www-data:rX "$release/public"
+as_owner ln -s "$site/shared/.env" "$release/.env"
+as_owner ln -s "$site/shared/storage" "$release/storage"
+
+cd "$release"
+as_owner php artisan storage:link
+as_owner php artisan migrate --force
+as_owner php artisan optimize
+
+# A rename over the old link, so a request sees either release, never neither.
+as_owner ln -sfn "$release" "$site/current.next"
+as_owner mv -T "$site/current.next" "$site/current"
+trap - EXIT
+
+# OPcache and the realpath cache still hold the old release's files.
+systemctl reload php8.5-fpm
+
+find "$site/releases" -mindepth 1 -maxdepth 1 -type d -print0 | sort -z | head -z -n "-$releases_kept" | xargs -0 -r rm -rf
+
+echo "Live: $release"

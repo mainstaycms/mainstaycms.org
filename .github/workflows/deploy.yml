@@ -1,0 +1,111 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One deploy at a time, and a newer push waits rather than cancelling one
+# halfway through its migrations.
+concurrency:
+  group: production
+  cancel-in-progress: false
+
+env:
+  PHP_VERSION: '8.5'
+  NETBIRD_VERSION: '0.82.0'
+  NETBIRD_MANAGEMENT_URL: https://netbird.schotman.app
+  SERVER: 10.100.149.180
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: mainstay
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -proot"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: gd, exif, pdo_mysql
+          coverage: none
+      - run: composer install --no-interaction --no-progress
+      - run: cp .env.example .env && php artisan key:generate
+      - run: php artisan test
+      # Production's tables come from the migrations alone, on the server's
+      # MySQL, so this is the check that they still match app/Content.
+      - name: Check the migrations against the content types
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_DATABASE: mainstay
+          DB_USERNAME: root
+          DB_PASSWORD: root
+        run: php artisan migrate --force && php artisan mainstay:schema:check
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment: production
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: gd, exif, pdo_mysql
+          coverage: none
+
+      - name: Build the release
+        run: |
+          composer install --no-dev --no-interaction --no-progress --optimize-autoloader
+          php artisan vendor:publish --tag=mainstay-assets
+          tar -czf "$RUNNER_TEMP/release.tgz" \
+            --exclude=./.git --exclude=./.github --exclude=./tests --exclude=./storage \
+            --exclude=./coming-soon --exclude=./deploy .
+
+      # A temporary peer in the group the server lets reach its SSH and
+      # nothing else; NetBird removes it ten minutes after it goes offline.
+      - name: Join NetBird
+        env:
+          NETBIRD_SETUP_KEY: ${{ secrets.NETBIRD_SETUP_KEY }}
+        run: |
+          curl -fsSL https://pkgs.netbird.io/debian/public.key \
+            | sudo gpg --dearmor --output /usr/share/keyrings/netbird-archive-keyring.gpg
+          echo 'deb [signed-by=/usr/share/keyrings/netbird-archive-keyring.gpg] https://pkgs.netbird.io/debian stable main' \
+            | sudo tee /etc/apt/sources.list.d/netbird.list
+          sudo apt-get update
+          sudo apt-get install -y "netbird=$NETBIRD_VERSION"
+          sudo netbird up --setup-key "$NETBIRD_SETUP_KEY" --management-url "$NETBIRD_MANAGEMENT_URL" \
+            --hostname "github-deploy-$GITHUB_RUN_ID"
+          timeout 60 sh -c 'until nc -z "$SERVER" 22; do sleep 2; done'
+
+      # The key's forced command on the server reads the tarball from stdin
+      # and the commit from what is asked to run; it can do nothing else.
+      - name: Deploy
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ vars.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          install -m 600 /dev/null ~/.ssh/deploy
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy
+          ssh -i ~/.ssh/deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes "root@$SERVER" "$GITHUB_SHA" \
+            < "$RUNNER_TEMP/release.tgz"
+
+      - name: Leave NetBird
+        if: always()
+        run: if command -v netbird > /dev/null; then sudo netbird down; fi
