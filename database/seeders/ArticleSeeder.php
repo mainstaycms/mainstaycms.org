@@ -461,7 +461,7 @@ class ArticleSeeder extends Seeder
                     - The original is kept on a private disk and never served. A camera's file carries EXIF data, its GPS position included, and the copies are written without it.
                     - Every size declared by an image field of any registered type or block is written in AVIF and in WebP, to a public disk.
 
-                    The images are made with spatie/image on GD, chosen over Imagick on purpose: one engine everywhere means one set of tests proves what is written. GD has to be built with AVIF and WebP, since every copy is written in both.
+                    The images are made with spatie/image on GD, chosen over Imagick on purpose: one engine everywhere means one set of tests proves what is written. Each copy is written in AVIF and WebP where GD writes them, and in the original's own format where it writes no WebP.
 
                     ## Names that cannot go stale
 

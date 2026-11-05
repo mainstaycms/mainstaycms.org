@@ -100,7 +100,7 @@ class SiteTest extends TestCase
         $this->get(self::SITE.'/docs')
             ->assertSeeInOrder(['<nav class="gn-links"', 'href="'.self::SITE.'/features"', 'href="'.self::SITE.'/docs"  aria-current="page"', 'href="'.self::SITE.'/blog"', '</nav>'], escape: false)
             ->assertSeeInOrder(['<h2 id="footer-product">Product</h2>', '>Page builder</a>', '<h2 id="footer-reading">Docs</h2>', '>Installation</a>', '<h2 id="footer-project">Project</h2>', 'href="https://github.com/mainstaycms/mainstay/blob/main/docs/decisions.md"'], escape: false)
-            ->assertSee('PHP 8.3+ with GD (AVIF and WebP) · Laravel 13');
+            ->assertSee('PHP 8.3+ with GD · Laravel 13');
         $this->get(self::SITE.'/docs/fields')->assertSee('href="'.self::SITE.'/docs"  aria-current="true"', escape: false);
         $this->get(self::SITE.'/blog/tag/editing')->assertSee('href="'.self::SITE.'/blog"  aria-current="true"', escape: false);
         $this->get(self::SITE.'/page-builder')
@@ -188,7 +188,7 @@ class SiteTest extends TestCase
         $this->assertSame(8, DB::table('mainstay_media')->count(), 'Each screenshot once, however many pages show it.');
 
         $this->get(self::SITE.'/')
-            ->assertSee('<picture><source type="image/avif"', escape: false)
+            ->assertSee('<picture>', escape: false)
             ->assertSee('alt="The Content tab of the admin', escape: false);
         $this->get(self::SITE.'/page-builder')->assertSee('<span class="pin" style="left: 25%; top: 14%"><b aria-hidden="true"></b>The block toolbar</span>', escape: false);
     }

@@ -49,12 +49,12 @@ class DocSeeder extends Seeder
                     ## Requirements
                     TEXT),
                 ['block' => Tiles::class, 'data' => ['style' => 'grid'], 'inner' => [
-                    ['block' => Tile::class, 'data' => ['label' => 'PHP', 'value' => '8.3 or newer, with GD built for AVIF and WebP']],
+                    ['block' => Tile::class, 'data' => ['label' => 'PHP', 'value' => '8.3 or newer, with GD']],
                     ['block' => Tile::class, 'data' => ['label' => 'Laravel', 'value' => '13']],
                     ['block' => Tile::class, 'data' => ['label' => 'Database', 'value' => 'SQLite, PostgreSQL, MySQL or SQL Server']],
                 ]],
                 ...$this->paragraphs(<<<'TEXT'
-                    GD is what images are resized with, and every copy is written as AVIF and WebP, so the GD in your PHP must be built with both. An upload on a GD without them is refused, naming the format it lacks; `gd_info()` lists what yours supports.
+                    GD is what images are resized with. Every copy is written as AVIF and WebP where your GD writes them, and in the original's own format, JPEG or PNG, where it writes no WebP: a host without them serves larger files, never broken ones. `gd_info()` lists what yours supports, and `mainstay:media:reprocess` writes a format your GD gains later.
 
                     ## Install the package
 
@@ -345,7 +345,7 @@ class DocSeeder extends Seeder
             'summary' => 'The media library, the sizes an image field declares, and printing an image as a picture.',
             'content' => $this->blocks(...[
                 ...$this->paragraphs(<<<'TEXT'
-                    Images live in one media library for the whole installation. A field holds an image's id, and declares the sizes it is printed at. Every one of those sizes is written as AVIF and WebP when a file is uploaded. A size added later is written by `mainstay:media:reprocess`, which queues the missing copies of every image.
+                    Images live in one media library for the whole installation. A field holds an image's id, and declares the sizes it is printed at. Every one of those sizes is written as AVIF and WebP when a file is uploaded, as far as your GD writes them. A size added later is written by `mainstay:media:reprocess`, which queues the missing copies of every image.
 
                     ## Declare the sizes
                     TEXT),
@@ -360,7 +360,7 @@ class DocSeeder extends Seeder
 
                         {{ $entry->cover?->picture('cover') }}
 
-                    `picture()` prints a `<picture>` with the AVIF as a source and the WebP as the `<img>`, with the alt text and the copy's real width and height, lazy unless you pass other attributes. For your own markup there are `url('card')`, `url('card', 'avif')`, `width('card')` and `height('card')`.
+                    `picture()` prints a `<picture>` with the AVIF as a source and the WebP as the `<img>`, offering only the formats the image was written in, with the alt text and the copy's real width and height, lazy unless you pass other attributes. For your own markup there are `url('card')`, `url('card', 'avif')`, null for a format the image was not written in, `width('card')` and `height('card')`.
 
                     ## Upload from code
 

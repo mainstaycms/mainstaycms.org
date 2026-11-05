@@ -427,7 +427,7 @@ class PageSeeder extends Seeder
                             ],
                         ],
                     ]),
-                    $feature('images', 'Images', 'Images written once', 'One media library for the installation, with alt text in every language and a focal point. Every size a field declares is written as AVIF and WebP when a file is uploaded. A size added later is written by `mainstay:media:reprocess`, which queues the missing copies of every image.', [
+                    $feature('images', 'Images', 'Images written once', 'One media library for the installation, with alt text in every language and a focal point. Every size a field declares is written as AVIF and WebP when a file is uploaded, as far as the server\'s GD can. A size added later is written by `mainstay:media:reprocess`, which queues the missing copies of every image.', [
                         $this->screenshot('media-library'),
                         ['block' => Badges::class, 'data' => ['items' => "JPEG, PNG, GIF and WebP in\nAVIF and WebP out\nevery declared size\na focal point\nalt text per language"]],
                     ]),
@@ -778,7 +778,7 @@ class PageSeeder extends Seeder
             'product' => array_map(fn (string $slug) => $this->pages[$slug], ['features', 'page-builder', 'plugins', 'roadmap', 'blog']),
             'reading' => [$this->toPage('docs'), $this->toDoc('installation'), $this->toDoc('first-content-type'), $this->toDoc('content-api')],
             'copyright' => '© 2026 Mainstay. MIT licence.',
-            'requirements' => 'PHP 8.3+ with GD (AVIF and WebP) · Laravel 13',
+            'requirements' => 'PHP 8.3+ with GD · Laravel 13',
         ], locale: 'en', overrideAccess: true);
     }
 }
