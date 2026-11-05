@@ -218,6 +218,38 @@ class SiteTest extends TestCase
         $this->assertStringContainsString("Sitemap: https://mainstaycms.org/sitemap.xml\n", file_get_contents(public_path('robots.txt')));
     }
 
+    public function test_a_page_names_its_canonical_link_and_how_it_shares(): void
+    {
+        $this->get(self::SITE.'/blog?page=2')
+            ->assertSee('<link rel="canonical" href="'.self::SITE.'/blog">', escape: false)
+            ->assertSee('<meta property="og:url" content="'.self::SITE.'/blog">', escape: false)
+            ->assertSee('<meta property="og:title" content="Blog, page 2">', escape: false)
+            ->assertSee('<meta property="og:type" content="website">', escape: false)
+            ->assertDontSee('application/ld+json', escape: false);
+
+        $front = $this->get(self::SITE.'/')->getContent();
+        $this->assertSame('SoftwareApplication', $this->structuredData($front)['@type']);
+        $this->assertSame(self::SITE, $this->structuredData($front)['url']);
+
+        $article = $this->get(self::SITE.'/blog/a-token-holds-less-than-its-account')
+            ->assertSee('<meta property="og:type" content="article">', escape: false)
+            ->assertSee('<meta property="og:description" content="The content API reads', escape: false)
+            ->getContent();
+        $posting = $this->structuredData($article);
+
+        $this->assertSame(['BlogPosting', 'A token holds less than its account', '2026-11-03'], [$posting['@type'], $posting['headline'], $posting['datePublished']]);
+        $this->get(self::SITE.'/docs/installation')->assertSee('rel="canonical"', escape: false)->assertDontSee('application/ld+json', escape: false);
+        $this->get(self::SITE.'/nothing-here')->assertNotFound()->assertDontSee('rel="canonical"', escape: false);
+    }
+
+    /* The JSON-LD a page carries, decoded. */
+    private function structuredData(string $page): array
+    {
+        preg_match('#<script type="application/ld\+json">(.*?)</script>#s', $page, $match);
+
+        return json_decode($match[1] ?? 'null', true, flags: JSON_THROW_ON_ERROR);
+    }
+
     public function test_a_path_or_a_host_the_site_does_not_serve_is_not_found(): void
     {
         $this->get(self::SITE.'/nothing-here')->assertNotFound()->assertSee('Page not found')->assertSee('href="'.self::SITE.'/"', escape: false);

@@ -39,6 +39,17 @@
     @if ($description)
         <meta name="description" content="{{ $description }}">
     @endif
+    {{-- Only an entry is a page to point search engines and shares at; a 404 is not. --}}
+    @if ($entry)
+        <link rel="canonical" href="{{ url()->current() }}">
+        <meta property="og:title" content="{{ $title }}">
+        @if ($description)
+            <meta property="og:description" content="{{ $description }}">
+        @endif
+        <meta property="og:url" content="{{ url()->current() }}">
+        <meta property="og:type" content="{{ $entry instanceof Article ? 'article' : 'website' }}">
+        <x-structured-data :entry="$entry" />
+    @endif
     <link rel="icon" href="/favicon.ico" sizes="32x32">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     {{-- Stamped with when they changed, so a browser keeps them for good and a deploy that changes one is a new address. --}}
