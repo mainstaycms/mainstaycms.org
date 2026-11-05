@@ -8,6 +8,7 @@ use App\Content\Layout;
 use App\Content\Page;
 use App\Content\Phase;
 use App\Content\Tag;
+use App\Http\SiteAssets;
 use Illuminate\Support\ServiceProvider;
 use Mainstay\Facades\Mainstay;
 
@@ -27,7 +28,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Mainstay::types([Page::class, Article::class, Tag::class, Doc::class, Phase::class, Layout::class]);
-        /* Stamped as the layout links it, since browsers keep it for good. */
-        Mainstay::editorStyles(['/css/site.css?v='.filemtime(public_path('css/site.css'))], class: 'prose');
+        Mainstay::editorStyles([SiteAssets::stylesheet()], class: 'prose');
     }
 }

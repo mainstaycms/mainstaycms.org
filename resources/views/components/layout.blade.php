@@ -6,6 +6,7 @@
 @use('App\Content\Layout')
 @use('App\Content\Page')
 @use('App\Content\Tag')
+@use('App\Http\SiteAssets')
 @use('Mainstay\Content\Entry')
 @use('Mainstay\Facades\Mainstay')
 @php
@@ -52,9 +53,8 @@
     @endif
     <link rel="icon" href="/favicon.ico" sizes="32x32">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-    {{-- Stamped with when they changed, so a browser keeps them for good and a deploy that changes one is a new address. --}}
-    <link rel="stylesheet" href="/css/site.css?v={{ filemtime(public_path('css/site.css')) }}">
-    <script src="/js/site.js?v={{ filemtime(public_path('js/site.js')) }}" defer></script>
+    <link rel="stylesheet" href="{{ SiteAssets::stylesheet() }}">
+    <script src="{{ SiteAssets::script() }}" defer></script>
 </head>
 <body>
     <a class="skip" href="#content">{{ __('Skip to content') }}</a>

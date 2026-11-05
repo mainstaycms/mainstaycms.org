@@ -242,6 +242,21 @@ class SiteTest extends TestCase
         $this->get(self::SITE.'/nothing-here')->assertNotFound()->assertDontSee('rel="canonical"', escape: false);
     }
 
+    public function test_a_page_has_its_stylesheet_and_fonts_fetched_alongside_it(): void
+    {
+        $link = $this->get(self::SITE.'/')->assertOk()->headers->get('Link');
+
+        $this->assertStringStartsWith('</css/site.css?v='.filemtime(public_path('css/site.css')).'>; rel=preload; as=style, ', $link);
+
+        foreach ([400, 500, 600] as $weight) {
+            $font = "/vendor/mainstay/poppins-{$weight}-latin.woff2";
+            $this->assertStringContainsString("<{$font}>; rel=preload; as=font; type=\"font/woff2\"; crossorigin", $link);
+            $this->assertFileExists(base_path('vendor/mainstay/cms/dist/'.basename($font)), 'A font the package no longer publishes would be fetched for nothing.');
+        }
+
+        $this->assertNull($this->get(self::SITE.'/sitemap.xml')->headers->get('Link'), 'Only a page has a first screen.');
+    }
+
     /* The JSON-LD a page carries, decoded. */
     private function structuredData(string $page): array
     {

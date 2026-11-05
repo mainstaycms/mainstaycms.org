@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\PreloadSiteAssets;
+
 return [
 
     /*
@@ -37,6 +39,14 @@ return [
         'prefix' => env('MAINSTAY_API_PREFIX', 'api/mainstay'),
 
         'middleware' => ['api'],
+    ],
+
+    /* The package's own, and the Link header that has the first screen's
+       files fetched alongside the page. */
+    'site' => [
+        'enabled' => true,
+
+        'middleware' => ['web', PreloadSiteAssets::class],
     ],
 
     /*
