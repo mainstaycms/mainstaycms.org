@@ -354,13 +354,13 @@ class DocSeeder extends Seeder
                     public ?Media $cover;
                     PHP]],
                 ...$this->paragraphs(<<<'TEXT'
-                    A width and a height crop to that shape around the image's focal point; a width alone scales. Neither enlarges an image smaller than the size. The property is always nullable, since null is no image chosen; `required: true` is what makes a write need one.
+                    A width and a height crop to that shape around the image's focal point; a width alone scales. Neither enlarges an image smaller than the size. Each size is also written at a half and a quarter, none narrower than 150 pixels, for smaller screens. The property is always nullable, since null is no image chosen; `required: true` is what makes a write need one.
 
                     ## Print one
 
                         {{ $entry->cover?->picture('cover') }}
 
-                    `picture()` prints a `<picture>` with the AVIF as a source and the WebP as the `<img>`, offering only the formats the image was written in, with the alt text and the copy's real width and height, lazy unless you pass other attributes. For your own markup there are `url('card')`, `url('card', 'avif')`, null for a format the image was not written in, `width('card')` and `height('card')`.
+                    `picture()` prints a `<picture>` with the AVIF as a source and the WebP as the `<img>`, offering only the formats the image was written in, with the alt text and the copy's real width and height, lazy unless you pass other attributes. Each source and the `<img>` offer the size's half and quarter in a `srcset`, so the browser fetches the smallest copy that is sharp enough: a lazy image is matched to the width it is laid out at, any other to the screen's width unless you pass `sizes`. The API lists them after each size, as `cover@0.5` and `cover@0.25`, so a size's own name holds no `@`. For your own markup there are `url('card')`, `url('card', 'avif')`, null for a format the image was not written in, `width('card')` and `height('card')`.
 
                     ## Upload from code
 

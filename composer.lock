@@ -2196,16 +2196,16 @@
         },
         {
             "name": "mainstay/cms",
-            "version": "v0.1.1",
+            "version": "v0.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mainstaycms/cms.git",
-                "reference": "4fcbc07b549b8db47b4b834e651223cfdea4d076"
+                "reference": "0d27ff05aa17d9c2ca00d3b0748ded2ba4d407e8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mainstaycms/cms/zipball/4fcbc07b549b8db47b4b834e651223cfdea4d076",
-                "reference": "4fcbc07b549b8db47b4b834e651223cfdea4d076",
+                "url": "https://api.github.com/repos/mainstaycms/cms/zipball/0d27ff05aa17d9c2ca00d3b0748ded2ba4d407e8",
+                "reference": "0d27ff05aa17d9c2ca00d3b0748ded2ba4d407e8",
                 "shasum": ""
             },
             "require": {
@@ -2243,6 +2243,7 @@
                 "MIT"
             ],
             "description": "A CMS for Laravel: content modelled in PHP, edited in a Blade admin, rendered by the host app's Blade views or served headless over a REST and MCP API.",
+            "homepage": "https://mainstaycms.org",
             "keywords": [
                 "cms",
                 "content",
@@ -2250,13 +2251,13 @@
                 "laravel"
             ],
             "support": {
-                "source": "https://github.com/mainstaycms/cms/tree/v0.1.1"
+                "source": "https://github.com/mainstaycms/cms/tree/v0.1.2"
             },
-            "time": "2026-11-05T04:33:26+00:00"
+            "time": "2026-11-05T08:06:02+00:00"
         },
         {
             "name": "mainstay/ui",
-            "version": "v0.1.1",
+            "version": "v0.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mainstaycms/ui.git",
@@ -2297,7 +2298,7 @@
                 "laravel"
             ],
             "support": {
-                "source": "https://github.com/mainstaycms/ui/tree/v0.1.1"
+                "source": "https://github.com/mainstaycms/ui/tree/v0.1.2"
             },
             "time": "2026-11-04T20:14:21+00:00"
         },
