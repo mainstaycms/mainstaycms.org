@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "48f64279ba681b21b808272c8dc6a45c",
+    "content-hash": "491de5cec03ec3b8d6f39c3c57732dc7",
     "packages": [
         {
             "name": "brick/math",
@@ -1138,8 +1138,7 @@
                 "issues": "https://github.com/laravel/ai/issues",
                 "source": "https://github.com/laravel/ai"
             },
-            "time": "2026-10-19T16:50:18+00:00",
-            "published-time": "2026-10-19T16:56:23+00:00"
+            "time": "2026-10-19T16:50:18+00:00"
         },
         {
             "name": "laravel/framework",
@@ -2197,11 +2196,17 @@
         },
         {
             "name": "mainstay/cms",
-            "version": "dev-main",
+            "version": "v0.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mainstaycms/cms.git",
+                "reference": "4fcbc07b549b8db47b4b834e651223cfdea4d076"
+            },
             "dist": {
-                "type": "path",
-                "url": "../mainstay/packages/cms",
-                "reference": "e1c7017be3995a82c8f0b96fcae639413e12b0a5"
+                "type": "zip",
+                "url": "https://api.github.com/repos/mainstaycms/cms/zipball/4fcbc07b549b8db47b4b834e651223cfdea4d076",
+                "reference": "4fcbc07b549b8db47b4b834e651223cfdea4d076",
+                "shasum": ""
             },
             "require": {
                 "illuminate/auth": "^13.0",
@@ -2213,19 +2218,19 @@
                 "illuminate/validation": "^13.0",
                 "laravel/ai": "^1.3",
                 "laravel/mcp": "^1.1",
-                "mainstay/ui": "@dev",
+                "mainstay/ui": "self.version",
                 "php": "^8.3",
                 "spatie/image": "^3.9"
             },
             "type": "library",
             "extra": {
                 "laravel": {
-                    "providers": [
-                        "Mainstay\\MainstayServiceProvider"
-                    ],
                     "aliases": {
                         "Mainstay": "Mainstay\\Facades\\Mainstay"
-                    }
+                    },
+                    "providers": [
+                        "Mainstay\\MainstayServiceProvider"
+                    ]
                 }
             },
             "autoload": {
@@ -2233,28 +2238,35 @@
                     "Mainstay\\": "src/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
-            "description": "A headless CMS for Laravel: content modelled in PHP, edited in a Blade admin, served to static sites over HTTP.",
+            "description": "A CMS for Laravel: content modelled in PHP, edited in a Blade admin, rendered by the host app's Blade views or served headless over a REST and MCP API.",
             "keywords": [
                 "cms",
                 "content",
                 "headless",
                 "laravel"
             ],
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
+            "support": {
+                "source": "https://github.com/mainstaycms/cms/tree/v0.1.1"
+            },
+            "time": "2026-11-05T04:33:26+00:00"
         },
         {
             "name": "mainstay/ui",
-            "version": "dev-main",
+            "version": "v0.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mainstaycms/ui.git",
+                "reference": "e1a6fd3ebfede9bf54dfcdf79b447c20523aaf8c"
+            },
             "dist": {
-                "type": "path",
-                "url": "../mainstay/packages/ui",
-                "reference": "65a7dfe72a3136c13e461e994302363e4aca9b1e"
+                "type": "zip",
+                "url": "https://api.github.com/repos/mainstaycms/ui/zipball/e1a6fd3ebfede9bf54dfcdf79b447c20523aaf8c",
+                "reference": "e1a6fd3ebfede9bf54dfcdf79b447c20523aaf8c",
+                "shasum": ""
             },
             "require": {
                 "illuminate/support": "^13.0",
@@ -2274,6 +2286,7 @@
                     "Mainstay\\Ui\\": "src/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -2283,10 +2296,10 @@
                 "design-system",
                 "laravel"
             ],
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
+            "support": {
+                "source": "https://github.com/mainstaycms/ui/tree/v0.1.1"
+            },
+            "time": "2026-11-04T20:14:21+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -6345,8 +6358,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-10-18T14:56:39+00:00",
-            "published-time": "2026-10-28T18:23:45+00:00"
+            "time": "2026-10-18T14:56:39+00:00"
         },
         {
             "name": "tijsverkoyen/css-to-inline-styles",
@@ -8866,15 +8878,12 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "mainstay/cms": 20,
-        "mainstay/ui": 20
-    },
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": "^8.3"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.11.0"
+    "plugin-api-version": "2.9.0"
 }

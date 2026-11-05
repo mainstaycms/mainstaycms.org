@@ -4,8 +4,8 @@ Mainstay's own project site, and the host its phases are tried against. Every pa
 written by the seeders `database/seeders/ContentSeeder.php` calls and served by Mainstay's catch-all; there is no
 route of its own.
 
-It needs `mainstay` checked out beside it: `composer.json` takes `mainstay/cms` and `mainstay/ui`
-from `../mainstay/packages` as symlinked path repositories.
+It installs `mainstay/cms` from Packagist, as any site would, so it runs against a released
+version.
 
 ```bash
 composer install
