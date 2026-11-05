@@ -41,8 +41,9 @@
     @endif
     <link rel="icon" href="/favicon.ico" sizes="32x32">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="/css/site.css">
-    <script src="/js/site.js" defer></script>
+    {{-- Stamped with when they changed, so a browser keeps them for good and a deploy that changes one is a new address. --}}
+    <link rel="stylesheet" href="/css/site.css?v={{ filemtime(public_path('css/site.css')) }}">
+    <script src="/js/site.js?v={{ filemtime(public_path('js/site.js')) }}" defer></script>
 </head>
 <body>
     <a class="skip" href="#content">{{ __('Skip to content') }}</a>

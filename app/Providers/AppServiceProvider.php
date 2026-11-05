@@ -27,6 +27,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Mainstay::types([Page::class, Article::class, Tag::class, Doc::class, Phase::class, Layout::class]);
-        Mainstay::editorStyles(['/css/site.css'], class: 'prose');
+        /* Stamped as the layout links it, since browsers keep it for good. */
+        Mainstay::editorStyles(['/css/site.css?v='.filemtime(public_path('css/site.css'))], class: 'prose');
     }
 }

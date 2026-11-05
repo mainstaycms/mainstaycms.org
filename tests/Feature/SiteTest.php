@@ -68,7 +68,7 @@ class SiteTest extends TestCase
             ->assertSee('<span class="hl"><span style="animation-delay: 0s">Content modelled in PHP,</span></span>', escape: false)
             ->assertSee('<span class="t-key">class</span> <span class="t-type">Article</span> <span class="t-key">extends</span> <span class="t-type">Entry</span>', escape: false)
             ->assertSee('<a class="btn btn-acc" href="'.self::SITE.'/docs/installation">Read the docs', escape: false)
-            ->assertSee('<script src="/js/site.js" defer></script>', escape: false)
+            ->assertSee('<script src="/js/site.js?v='.filemtime(public_path('js/site.js')).'" defer></script>', escape: false)
             ->assertSee('<link rel="icon" href="/favicon.svg" type="image/svg+xml">', escape: false)
             ->assertSee('<a class="feat rv"  href="'.self::SITE.'/features#query" >', escape: false)
             ->assertSee('Phases 1 to 13 are done')
