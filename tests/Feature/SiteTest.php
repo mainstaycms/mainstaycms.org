@@ -16,6 +16,7 @@ use Mainstay\Auth\User;
 use Mainstay\Content\Entry;
 use Mainstay\Content\GlobalSet;
 use Mainstay\Facades\Mainstay;
+use SimpleXMLElement;
 use Symfony\Component\HttpFoundation\Cookie;
 use Tests\TestCase;
 
@@ -199,6 +200,22 @@ class SiteTest extends TestCase
 
         $this->get(self::SITE.'/blog/not-yet')->assertNotFound();
         $this->get(self::SITE.'/blog')->assertDontSee('Not yet');
+    }
+
+    public function test_the_sitemap_lists_every_published_page_with_when_it_changed(): void
+    {
+        Mainstay::drafts()->save(Article::class, ['title' => 'Not yet', 'slug' => 'not-yet', 'summary' => 'Unpublished.', 'publishedOn' => '2026-11-03'], overrideAccess: true);
+
+        $sitemap = $this->get(self::SITE.'/sitemap.xml')->assertOk()->assertHeader('Content-Type', 'application/xml')->getContent();
+        $xml = simplexml_load_string($sitemap);
+        $links = array_map(fn (SimpleXMLElement $url) => (string) $url->loc, iterator_to_array($xml->url, false));
+
+        $this->assertCount(40, $links, 'What every entry renders at: seven pages, eleven articles, three tags and nineteen docs.');
+        $this->assertContains(self::SITE.'/', $links, 'The front page, at the root.');
+        $this->assertContains(self::SITE.'/blog/a-token-holds-less-than-its-account', $links);
+        $this->assertNotContains(self::SITE.'/blog/not-yet', $links, 'Not a draft.');
+        $this->assertMatchesRegularExpression('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+00:00$/', (string) $xml->url[0]->lastmod);
+        $this->assertStringContainsString("Sitemap: https://mainstaycms.org/sitemap.xml\n", file_get_contents(public_path('robots.txt')));
     }
 
     public function test_a_path_or_a_host_the_site_does_not_serve_is_not_found(): void
