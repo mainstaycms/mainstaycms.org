@@ -19,6 +19,9 @@ env:
   NETBIRD_VERSION: '0.82.0'
   NETBIRD_MANAGEMENT_URL: https://netbird.schotman.app
   SERVER: 10.100.149.180
+  SITE: mainstaycms.org
+  # Public by design: IndexNow checks it against the file of that name at the site's root.
+  INDEXNOW_KEY: 57c941c9baf0171010a6cbccd2b692cc
 
 jobs:
   test:
@@ -109,3 +112,15 @@ jobs:
       - name: Leave NetBird
         if: always()
         run: if command -v netbird > /dev/null; then sudo netbird down; fi
+
+      # Bing, Yandex and the other engines IndexNow reaches hear of every page
+      # the live sitemap lists. Their failing leaves the deploy done.
+      - name: Tell IndexNow
+        continue-on-error: true
+        run: |
+          curl -fsS "https://$SITE/sitemap.xml" \
+            | grep -o '<loc>[^<]*</loc>' | sed -e 's|<loc>||' -e 's|</loc>||' \
+            | jq -R . | jq -s --arg host "$SITE" --arg key "$INDEXNOW_KEY" \
+                '{host: $host, key: $key, keyLocation: "https://\($host)/\($key).txt", urlList: .}' \
+            | curl -fsS -X POST https://api.indexnow.org/indexnow \
+                -H 'Content-Type: application/json; charset=utf-8' --data-binary @-
